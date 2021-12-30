@@ -279,7 +279,7 @@ void DigitalDecoder::sendSensorsDiscovery(uint32_t serial)
     
     sendSensorDiscovery(serial, BATTERY_NAME, "battery", LOW_BAT_MSG, OK_BAT_MSG);
     
-    sendSensorDiscovery(serial, HB_NAME, "connectivity", "1", "", true, SENSOR_EXPIRATION);
+    sendSensorDiscovery(serial, HB_NAME, "connectivity", "PING", "", true, SENSOR_EXPIRATION);
 }
 
 void DigitalDecoder::updateSensorState(uint32_t serial, uint64_t payload)
@@ -363,7 +363,7 @@ void DigitalDecoder::updateSensorState(uint32_t serial, uint64_t payload)
 
     if (currentState.lastUpdateTime - lastState.lastUpdateTime > UPDATE_INTERVAL) {
         std::string topic = getSensorTopic(serial, HB_NAME);
-        mqtt.send(topic.c_str(), currentState.lowBat ? LOW_BAT_MSG : OK_BAT_MSG, supervised ? 0 : 1);
+        mqtt.send(topic.c_str(), "PING", supervised ? 0 : 1);
     }
 
     sensorStatusMap[serial] = currentState;
