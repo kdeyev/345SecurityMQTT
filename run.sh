@@ -11,9 +11,6 @@ else
     exit $?
 fi
 
-echo "Connecting to $MQTT_HOST:$MQTT_PORT"
-echo "using username: $MQTT_USERNAME:$MQTT_PASSWORD"
-
 AUTODISCOVERY=$(bashio::config "autodiscovery")
 DEVICE_ID=$(bashio::config "device_id")
 FREQUENCY=$(bashio::config "frequency")

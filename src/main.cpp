@@ -52,12 +52,8 @@ int main(int argc, char ** argv)
         mqttPassword = MQTT_PASSWORD;
     }
 
-    std::cout << "Connecting to " << mqttHost << ":" << mqttPort << std::endl;
-    std::cout << "using username: " << mqttUsername << ":" << mqttPassword << std::endl;
-
     Mqtt mqtt = Mqtt("sensors345", mqttHost, mqttPort, mqttUsername, mqttPassword, "security/sensors345/rx_status", "FAILED");
 
-    
     int devId = 0;
     int freq = 345000000;
     signed char c;
