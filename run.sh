@@ -5,7 +5,7 @@ if bashio::services.available "mqtt"; then
     MQTT_PASSWORD=$(bashio::services "mqtt" "password")
     MQTT_PORT=$(bashio::services "mqtt" "port")
     MQTT_USERNAME=$(bashio::services "mqtt" "username")
-    DISCOVERY=$(bashio::config "discovery")
+    AUTODISCOVERY=$(bashio::config "autodiscovery")
     DEVICE_ID=$(bashio::config "device_id")
     FREQUENCY=$(bashio::config "frequency")
 else
@@ -14,7 +14,7 @@ else
     exit $?
 fi
 
-echo "Starting 345toMqtt -d $DEVICE_ID -f $FREQUENCY"
-./345toMqtt -d $DEVICE_ID -f $FREQUENCY
+echo "Starting 345toMqtt -d $DEVICE_ID -f $FREQUENCY -a $AUTODISCOVERY"
+./345toMqtt -d $DEVICE_ID -f $FREQUENCY -a $AUTODISCOVERY
 echo "Exiting run.sh"
 exit $?

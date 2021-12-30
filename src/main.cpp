@@ -12,6 +12,7 @@
 #include <sys/time.h>
 #include <cstdlib>
 #include <string>
+#include <sstream>
 
 // TODO: MQTT Will doesn't seem to be working with HA as expected
 
@@ -52,22 +53,21 @@ int main(int argc, char ** argv)
         mqttPassword = MQTT_PASSWORD;
     }
 
-    bool sendDiscovery = true;
-    const char *_sendDiscovery = std::getenv("DISCOVERY");
-    if ((_sendDiscovery == NULL) || (std::char_traits<char>::length(_sendDiscovery) == 0))
-    {
-        sendDiscovery = false;
-    }
+    // bool sendDiscovery = true;
+    // const char *_sendDiscovery = std::getenv("DISCOVERY");
+    // if ((_sendDiscovery == NULL) || (std::char_traits<char>::length(_sendDiscovery) == 0))
+    // {
+    //     sendDiscovery = false;
+    // }
 
-    std::cout << "Discovery messages are " << (sendDiscovery ? "enabled" : "disabled") << std::endl;
 
     Mqtt mqtt = Mqtt("sensors345", mqttHost, mqttPort, mqttUsername, mqttPassword, "security/sensors345/rx_status", "FAILED");
-    DigitalDecoder dDecoder = DigitalDecoder(mqtt, sendDiscovery);
-    AnalogDecoder aDecoder;
+
     
     int devId = 0;
     int freq = 345000000;
     signed char c;
+    bool sendDiscovery = false;
     while ((c = getopt(argc, argv, "hd:f:")) != -1)
     {
         switch(c)
@@ -87,6 +87,11 @@ int main(int argc, char ** argv)
                 freq = atoi(optarg);
                 break;
             }
+            case 'a':
+            {
+                std::istringstream(optarg) >> sendDiscovery;
+                break;
+            }
             default: // including '?' unknown character
             {
                 std::cerr << "Unknown flag '" << c << std::endl;
@@ -96,6 +101,10 @@ int main(int argc, char ** argv)
         }
     }
     
+    std::cout << "Discovery messages are " << (sendDiscovery ? "enabled" : "disabled") << std::endl;
+    DigitalDecoder dDecoder = DigitalDecoder(mqtt, sendDiscovery);
+    AnalogDecoder aDecoder;
+
     //
     // Open the device
     //
