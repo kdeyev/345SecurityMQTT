@@ -22,11 +22,11 @@ You don't really need to do anything special for allowing the Auto Discovery mes
 
 Pay attention that each device will be discovered with multiple sensors:
 - loo1-loop3: opening sensors. You'll need to identify which of them need to be used for your device.
-- tamper: safety sensor
-- battery: battery sensor. Binary sensor with notifies about low battery level
+- tamper: safety sensor.
+- battery: battery sensor. Binary sensor with notifies about low battery level.
 - heartbeat: connectivity sensor. HB sensor expects to get a ping message at least once in 75 minutes.
 
-keyfob anf keyfob are not supported with MQTT Auto Discovery yet
+keyfob anf keyfob are not supported with MQTT Auto Discovery yet.
 
 For more information about MQTT Auto Discovery see [documentation](https://www.home-assistant.io/integrations/#search/mqtt) and search the [HA forum](https://community.home-assistant.io/search?q=mqtt%20sensor).
 
@@ -43,6 +43,11 @@ On a Debian-based system, something like this should work:
 ```
   sudo apt-get install build-essential librtlsdr-dev rtl-sdr libmosquittopp-dev
 ```
+On a Alpine-based system, something like this should work:
+```
+  apk add --no-cache --virtual .buildDeps build-base libusb-dev librtlsdr-dev mosquitto-dev
+```
+
 
 To avoid having to run as root, you can add the following rule to a file in `/etc/udev/rules.d`:
 ```
