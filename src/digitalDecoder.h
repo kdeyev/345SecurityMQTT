@@ -20,8 +20,6 @@ protected:
 
   private:
 
-    // void writeDeviceState();
-    // void sendDeviceState();
     void sendSensorDiscovery(uint32_t serial);
     void updateSensorState(uint32_t serial, uint64_t payload);
     void updateKeypadState(uint32_t serial, uint64_t payload);
@@ -67,6 +65,7 @@ protected:
     std::map<uint32_t, sensorState_t> sensorStatusMap;
     std::map<uint32_t, keypadState_t> keypadStatusMap;
     uint64_t lastKeyfobPayload;
+    std::map<std::string, uint64_t> autoDiscoveryTime;
 };
 
 #endif
