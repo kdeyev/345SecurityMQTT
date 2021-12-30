@@ -1,15 +1,18 @@
 #!/usr/bin/env bashio
 
 if bashio::services.available "mqtt"; then
-    MQTT_HOST=$(bashio::services "mqtt" "host")
-    MQTT_PASSWORD=$(bashio::services "mqtt" "password")
-    MQTT_PORT=$(bashio::services "mqtt" "port")
-    MQTT_USERNAME=$(bashio::services "mqtt" "username")
+    export MQTT_HOST=$(bashio::services "mqtt" "host")
+    export MQTT_PASSWORD=$(bashio::services "mqtt" "password")
+    export MQTT_PORT=$(bashio::services "mqtt" "port")
+    export MQTT_USERNAME=$(bashio::services "mqtt" "username")
 else
     bashio::log.info "The mqtt addon is not available."
     bashio::log.info "Manually update the output line in the configuration file with mqtt connection settings, and restart the addon."
     exit $?
 fi
+
+echo "Connecting to $MQTT_HOST:$MQTT_PORT"
+echo "using username: $MQTT_USERNAME:$MQTT_PASSWORD"
 
 AUTODISCOVERY=$(bashio::config "autodiscovery")
 DEVICE_ID=$(bashio::config "device_id")
