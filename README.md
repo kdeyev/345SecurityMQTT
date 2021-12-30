@@ -74,6 +74,8 @@ Modify `mqtt_config.h` to specify the host, port, username, and password of your
 |---------------|----------------|------------|
 | `-d` <int>    | Device id      | 0          |
 | `-f` <int>    | Frequency      | 345000000  |
+| `-g` <int>    | Gain           | 700        |
+| `-s` <int>    | Sample Rate    | 1000000    |
 | `-a` <bool>   | Auto Discovery | false      |
 
 #### Environment variables

@@ -14,8 +14,10 @@ fi
 AUTODISCOVERY=$(bashio::config "autodiscovery")
 DEVICE_ID=$(bashio::config "device_id")
 FREQUENCY=$(bashio::config "frequency")
+SAMPLE_RATE=$(bashio::config "sample_rate")
+GAIN=$(bashio::config "gain")
 
-echo "Starting 345toMqtt -d $DEVICE_ID -f $FREQUENCY -a $AUTODISCOVERY"
-./345toMqtt -d $DEVICE_ID -f $FREQUENCY -a $AUTODISCOVERY
+echo "Starting 345toMqtt -d $DEVICE_ID -f $FREQUENCY -a $AUTODISCOVERY -g $GAIN -s $SAMPLE_RATE"
+./345toMqtt -d $DEVICE_ID -f $FREQUENCY -a $AUTODISCOVERY -g $GAIN -s $SAMPLE_RATE"
 echo "Exiting run.sh"
 exit $?
