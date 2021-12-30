@@ -1,6 +1,6 @@
 {
   "name": "345SecurityMQTT",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "slug": "345securitymqtt",
   "description": "Receive Honeywell wireless sensor data via an SDR dongle",
   "url": "https://github.com/kdeyev/345SecurityMQTT",

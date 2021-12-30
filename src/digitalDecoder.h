@@ -20,14 +20,16 @@ protected:
 
   private:
 
-    void sendSensorDiscovery(uint32_t serial);
+    void sendSensorsDiscovery(uint32_t serial);
+    void sendSensorDiscovery(uint32_t serial, const std::string& suffix, const std::string& device_class,
+                             const std::string& payload_on, const std::string& payload_off, bool force_update=false, int expire_after=0);
     void updateSensorState(uint32_t serial, uint64_t payload);
     void updateKeypadState(uint32_t serial, uint64_t payload);
     void updateKeyfobState(uint32_t serial, uint64_t payload);
     void handlePayload(uint64_t payload);
     void handleBit(bool value);
     void decodeBit(bool value);
-    void checkForTimeouts();
+    // void checkForTimeouts();
 
     bool sendDiscovery = false;
 

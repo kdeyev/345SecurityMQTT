@@ -27,13 +27,24 @@
 #define RX_GOOD_MIN_SEC (60)
 #define UPDATE_MIN_SEC (60)
 
+#define BASE_NAME "sensors345"
 #define BASE_TOPIC "security/sensors345/"
 #define SENSOR_TOPIC BASE_TOPIC"sensor/"
 #define KEYFOB_TOPIC BASE_TOPIC"keyfob/"
 #define KEYPAD_TOPIC BASE_TOPIC"keypad/"
 #define AUTODISCOVERY_TOPIC "homeassistant/binary_sensor/sensors345-"
+
+#define LOOP1_NAME "loop1"
+#define LOOP2_NAME "loop2"
+#define LOOP3_NAME "loop3"
+#define LOOP4_NAME "loop4"
+#define TAMPER_NAME "tamper"
+#define BATTERY_NAME "battery"
+#define HB_NAME "hb"
+
 #define AUTODISCOVERY_INTERVAL 60
 #define UPDATE_INTERVAL 2
+#define SENSOR_EXPIRATION 4500
 
 void addKeyValue(std::ostringstream& stream, const std::string& key, const std::string& value, bool comma=true) {
     stream << "\"" << key << "\": \"" << value << "\"";
@@ -49,6 +60,29 @@ void addKeyValue(std::ostringstream& stream, const std::string& key, const int& 
     }
 }
 
+std::string getDiscoveryTopic(uint32_t serial, const std::string& suffix) {
+    std::ostringstream topic;
+    topic << AUTODISCOVERY_TOPIC << serial << "/" << BASE_NAME << "-" << serial << "-" << suffix << "/config";
+    return topic.str();
+}
+
+std::string getSensorTopic(uint32_t serial, const std::string& suffix) {
+    std::ostringstream topic;
+    topic << SENSOR_TOPIC << serial << "/" << suffix;
+    return topic.str();
+}
+
+std::string getDeviceName(uint32_t serial) {
+    std::ostringstream topic;
+    topic << BASE_NAME << "-" << serial;
+    return topic.str();
+}
+
+std::string getSensorName(uint32_t serial, const std::string& suffix) {
+    std::ostringstream topic;
+    topic << BASE_NAME << "-" << serial << "-" << suffix;
+    return topic.str();
+}
 
 void DigitalDecoder::setRxGood(bool state)
 {
@@ -193,135 +227,65 @@ void DigitalDecoder::updateKeypadState(uint32_t serial, uint64_t payload)
     }
 }
 
-void DigitalDecoder::sendSensorDiscovery(uint32_t serial)
-{
+void DigitalDecoder::sendSensorDiscovery(uint32_t serial, const std::string& suffix, const std::string& device_class,
+                                         const std::string& payload_on, const std::string& payload_off, bool force_update, int expire_after) {
     timeval now;
     gettimeofday(&now, nullptr);
     uint64_t currentTime = now.tv_sec;
 
-    {
-        std::string suffix = "opening";
+    std::string topic = getDiscoveryTopic(serial, suffix);
 
-        std::ostringstream topic;
-        topic << AUTODISCOVERY_TOPIC << serial << "/sensors345-" << serial << "-" << suffix << "/config";
-
-        auto found = autoDiscoveryTime.find(topic.str());
-        if (found == autoDiscoveryTime.end() || currentTime - found->second > AUTODISCOVERY_INTERVAL) {
-            std::ostringstream message;
-            message << "{";
-            addKeyValue(message, "name", "Honeywell-Sensor-" + std::to_string(serial));
-            addKeyValue(message, "state_topic", SENSOR_TOPIC + std::to_string(serial) + "/loop2");
-            addKeyValue(message, "device_class", "opening");
-            addKeyValue(message, "unique_id", "sensors345-" + std::to_string(serial) + "-" + suffix);
-            addKeyValue(message, "payload_on", OPEN_SENSOR_MSG);
-            addKeyValue(message, "payload_off", CLOSED_SENSOR_MSG);
-            message << "\"device\": {";
-            addKeyValue(message, "identifiers", "sensors345-" + std::to_string(serial));
-            addKeyValue(message, "name", "sensors345-" + std::to_string(serial));
-            addKeyValue(message, "model", "Honeywell-Security");
-            addKeyValue(message, "manufacturer", "rtl_433", false);
-            message << "}";
-            message << "}";
-
-            mqtt.send(topic.str().c_str(), message.str().c_str());
-            autoDiscoveryTime[topic.str()] = currentTime;
-        }
-    }
-
-    {
-        std::string suffix = "tamper";
-
-        std::ostringstream topic;
-        topic << AUTODISCOVERY_TOPIC << serial << "/sensors345-" << serial << "-" << suffix << "/config";
-
-        auto found = autoDiscoveryTime.find(topic.str());
-        if (found == autoDiscoveryTime.end() || currentTime - found->second > AUTODISCOVERY_INTERVAL) {
-            std::ostringstream message;
-            message << "{";
-            addKeyValue(message, "name", "Honeywell-Sensor-" + std::to_string(serial));
-            addKeyValue(message, "state_topic", SENSOR_TOPIC + std::to_string(serial) + "/tamper");
-            addKeyValue(message, "device_class", "safety");
+    auto found = autoDiscoveryTime.find(topic);
+    if (found == autoDiscoveryTime.end() || currentTime - found->second >= AUTODISCOVERY_INTERVAL) {
+        std::ostringstream message;
+        message << "{";
+        addKeyValue(message, "name", getDeviceName(serial) + "-" + suffix);
+        addKeyValue(message, "state_topic", getSensorTopic(serial, suffix));
+        addKeyValue(message, "device_class", device_class);
+        if (force_update) {
             addKeyValue(message, "force_update", "true");
-            addKeyValue(message, "unique_id", "sensors345-" + std::to_string(serial) + "-" + suffix);
-            addKeyValue(message, "payload_on", TAMPER_MSG);
-            addKeyValue(message, "payload_off", UNTAMPERED_MSG);
-            message << "\"device\": {" ;
-            addKeyValue(message, "identifiers", "sensors345-" + std::to_string(serial));
-            addKeyValue(message, "name", "sensors345-" + std::to_string(serial));
-            addKeyValue(message, "model", "Honeywell-Security");
-            addKeyValue(message, "manufacturer", "rtl_433", false);
-            message << "}";
-            message << "}";
-
-            mqtt.send(topic.str().c_str(), message.str().c_str());
-            autoDiscoveryTime[topic.str()] = currentTime;
         }
-    }
-       
-    {
-        std::string suffix = "battery";
-
-        std::ostringstream topic;
-        topic << AUTODISCOVERY_TOPIC << serial << "/sensors345-" << serial << "-" << suffix << "/config";
-
-        auto found = autoDiscoveryTime.find(topic.str());
-        if (found == autoDiscoveryTime.end() || currentTime - found->second > AUTODISCOVERY_INTERVAL) {
-            std::ostringstream message;
-            message << "{";
-            addKeyValue(message, "name", "Honeywell-Sensor-" + std::to_string(serial));
-            addKeyValue(message, "state_topic", SENSOR_TOPIC + std::to_string(serial) + "/battery");
-            addKeyValue(message, "device_class", "battery");
-            addKeyValue(message, "unique_id", "sensors345-" + std::to_string(serial) + "-" + suffix);
-            addKeyValue(message, "payload_on", LOW_BAT_MSG);
-            addKeyValue(message, "payload_off", OK_BAT_MSG);
-            message << "\"device\": {";
-            addKeyValue(message, "identifiers", "sensors345-" + std::to_string(serial));
-            addKeyValue(message, "name", "sensors345-" + std::to_string(serial));
-            addKeyValue(message, "model", "Honeywell-Security");
-            addKeyValue(message, "manufacturer", "rtl_433", false);
-            message << "}";
-            message << "}";
-
-            mqtt.send(topic.str().c_str(), message.str().c_str());
-            autoDiscoveryTime[topic.str()] = currentTime;
+        if (expire_after) {
+            addKeyValue(message, "expire_after", expire_after);
         }
-    }
-
-    {
-        std::string suffix = "heartbeat";
-
-        std::ostringstream topic;
-        topic << AUTODISCOVERY_TOPIC << serial << "/sensors345-" << serial << "-" << suffix << "/config";
-
-        auto found = autoDiscoveryTime.find(topic.str());
-        if (found == autoDiscoveryTime.end() || currentTime - found->second > AUTODISCOVERY_INTERVAL) {
-            std::ostringstream message;
-            message << "{";
-            addKeyValue(message, "name", "Honeywell-Sensor-" + std::to_string(serial) + "-" + suffix);
-            addKeyValue(message, "state_topic", SENSOR_TOPIC + std::to_string(serial) + "/heartbeat");
-            addKeyValue(message, "device_class", "connectivity");
-            addKeyValue(message, "force_update", "true");
-            addKeyValue(message, "expire_after", 4500);
-            addKeyValue(message, "unique_id", "sensors345-" + std::to_string(serial) + "-" + suffix);
-            addKeyValue(message, "payload_on", "1");
-            message << "\"device\": {" ;
-            addKeyValue(message, "identifiers", "sensors345-" + std::to_string(serial));
-            addKeyValue(message, "name", "sensors345-" + std::to_string(serial));
-            addKeyValue(message, "model", "Honeywell-Security");
-            addKeyValue(message, "manufacturer", "rtl_433", false);
-            message << "}";
-            message << "}";
-
-            mqtt.send(topic.str().c_str(), message.str().c_str());
-            autoDiscoveryTime[topic.str()] = currentTime;
+        addKeyValue(message, "unique_id", getSensorName(serial, suffix));
+        if (payload_on.size()) {
+            addKeyValue(message, "payload_on", payload_on);
         }
+        if (payload_off.size()) {
+            addKeyValue(message, "payload_off", payload_off);
+        }
+        message << "\"device\": {" ;
+        addKeyValue(message, "identifiers", getDeviceName(serial));
+        addKeyValue(message, "name", getDeviceName(serial));
+        addKeyValue(message, "model", BASE_NAME);
+        addKeyValue(message, "manufacturer", BASE_NAME, false);
+        message << "}";
+        message << "}";
+
+        mqtt.send(topic.c_str(), message.str().c_str());
+        autoDiscoveryTime[topic] = currentTime;
     }
+}
+
+void DigitalDecoder::sendSensorsDiscovery(uint32_t serial)
+{
+    sendSensorDiscovery(serial, LOOP1_NAME, "opening", OPEN_SENSOR_MSG, CLOSED_SENSOR_MSG);
+    sendSensorDiscovery(serial, LOOP2_NAME, "opening", OPEN_SENSOR_MSG, CLOSED_SENSOR_MSG);
+    sendSensorDiscovery(serial, LOOP3_NAME, "opening", OPEN_SENSOR_MSG, CLOSED_SENSOR_MSG);
+    sendSensorDiscovery(serial, LOOP4_NAME, "opening", OPEN_SENSOR_MSG, CLOSED_SENSOR_MSG);
+
+    sendSensorDiscovery(serial, TAMPER_NAME, "safety", TAMPER_MSG, UNTAMPERED_MSG, true);
+    
+    sendSensorDiscovery(serial, BATTERY_NAME, "battery", LOW_BAT_MSG, OK_BAT_MSG);
+    
+    sendSensorDiscovery(serial, HB_NAME, "connectivity", "1", "", true, SENSOR_EXPIRATION);
 }
 
 void DigitalDecoder::updateSensorState(uint32_t serial, uint64_t payload)
 {
     if (this->sendDiscovery) {
-        this->sendSensorDiscovery(serial);
+        this->sendSensorsDiscovery(serial);
     }
 
     timeval now;
@@ -369,72 +333,66 @@ void DigitalDecoder::updateSensorState(uint32_t serial, uint64_t payload)
 
     if ((currentState.loop1 != lastState.loop1) || supervised)
     {
-        std::ostringstream topic;
-        topic << SENSOR_TOPIC << serial << "/loop1";
-        mqtt.send(topic.str().c_str(), currentState.loop1 ? OPEN_SENSOR_MSG : CLOSED_SENSOR_MSG, supervised ? 0 : 1);
+        std::string topic = getSensorTopic(serial, LOOP1_NAME);
+        mqtt.send(topic.c_str(), currentState.loop1 ? OPEN_SENSOR_MSG : CLOSED_SENSOR_MSG, supervised ? 0 : 1);
     }
 
     if ((currentState.loop2 != lastState.loop2) || supervised)
     {
-        std::ostringstream topic;
-        topic << SENSOR_TOPIC << serial << "/loop2";
-        mqtt.send(topic.str().c_str(), currentState.loop2 ? OPEN_SENSOR_MSG : CLOSED_SENSOR_MSG, supervised ? 0 : 1);
+        std::string topic = getSensorTopic(serial, LOOP2_NAME);
+        mqtt.send(topic.c_str(), currentState.loop2 ? OPEN_SENSOR_MSG : CLOSED_SENSOR_MSG, supervised ? 0 : 1);
     }
 
     if ((currentState.loop3 != lastState.loop3) || supervised)
     {
-        std::ostringstream topic;
-        topic << SENSOR_TOPIC << serial << "/loop3";
-        mqtt.send(topic.str().c_str(), currentState.loop3 ? OPEN_SENSOR_MSG : CLOSED_SENSOR_MSG, supervised ? 0 : 1);
+        std::string topic = getSensorTopic(serial, LOOP3_NAME);
+        mqtt.send(topic.c_str(), currentState.loop3 ? OPEN_SENSOR_MSG : CLOSED_SENSOR_MSG, supervised ? 0 : 1);
     }
 
     if ((currentState.tamper != lastState.tamper) || supervised)
     {
-        std::ostringstream topic;
-        topic << SENSOR_TOPIC << serial << "/tamper";
-        mqtt.send(topic.str().c_str(), currentState.tamper ? TAMPER_MSG : UNTAMPERED_MSG, supervised ? 0 : 1);
+        std::string topic = getSensorTopic(serial, TAMPER_NAME);
+        mqtt.send(topic.c_str(), currentState.tamper ? TAMPER_MSG : UNTAMPERED_MSG, supervised ? 0 : 1);
     }
 
     if ((currentState.lowBat != lastState.lowBat) || supervised)
     {
-        std::ostringstream topic;
-        topic << SENSOR_TOPIC << serial << "/battery";
-        mqtt.send(topic.str().c_str(), currentState.lowBat ? LOW_BAT_MSG : OK_BAT_MSG, supervised ? 0 : 1);
+        std::string topic = getSensorTopic(serial, BATTERY_NAME);
+        mqtt.send(topic.c_str(), currentState.lowBat ? LOW_BAT_MSG : OK_BAT_MSG, supervised ? 0 : 1);
     }
 
     if (currentState.lastUpdateTime - lastState.lastUpdateTime > UPDATE_INTERVAL) {
-        std::ostringstream topic;
-        topic << SENSOR_TOPIC << serial << "/heartbeat";
-        mqtt.send(topic.str().c_str(), currentState.lowBat ? LOW_BAT_MSG : OK_BAT_MSG, supervised ? 0 : 1);
+        std::string topic = getSensorTopic(serial, HB_NAME);
+        mqtt.send(topic.c_str(), currentState.lowBat ? LOW_BAT_MSG : OK_BAT_MSG, supervised ? 0 : 1);
     }
 
     sensorStatusMap[serial] = currentState;
 }
 
-/* Checks all devices for last time updated */
-void DigitalDecoder::checkForTimeouts()
-{
-    timeval now;
-    std::ostringstream status;
+// /* Checks all devices for last time updated */
+// void DigitalDecoder::checkForTimeouts()
+// {
+//     timeval now;
+//     std::ostringstream status;
 
-    status << "TIMEOUT";
-    gettimeofday(&now, nullptr);
+//     status << "TIMEOUT";
+//     gettimeofday(&now, nullptr);
 
-    for(const auto &dd : sensorStatusMap)
-    {
-        if ((now.tv_sec - dd.second.lastUpdateTime) > SENSOR_TIMEOUT_MIN*60)
-        {
-            if (false == dd.second.hasLostSupervision)
-            {
-                std::ostringstream statusTopic;
+//     for(const auto &dd : sensorStatusMap)
+//     {
+//         if ((now.tv_sec - dd.second.lastUpdateTime) > SENSOR_TIMEOUT_MIN*60)
+//         {
+//             if (false == dd.second.hasLostSupervision)
+//             {
+//                 std::ostringstream statusTopic;
 
-                sensorStatusMap[dd.first].hasLostSupervision = true;
-                statusTopic << BASE_TOPIC << dd.first << "/status";
-                mqtt.send(statusTopic.str().c_str(), status.str().c_str());
-            }
-        }
-    }
-}
+//                 sensorStatusMap[dd.first].hasLostSupervision = true;
+//                 statusTopic << BASE_TOPIC << dd.first << "/status";
+//                 mqtt.send(statusTopic.str().c_str(), status.str().c_str());
+//             }
+//         }
+//     }
+// }
 
 bool DigitalDecoder::isPayloadValid(uint64_t payload, uint64_t polynomial) const
 {
