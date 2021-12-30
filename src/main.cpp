@@ -53,7 +53,7 @@ int main(int argc, char ** argv)
     }
 
     bool sendDiscovery = true;
-    const char *_sendDiscovery = std::getenv("SEND_DISCOVERY");
+    const char *_sendDiscovery = std::getenv("DISCOVERY");
     if ((_sendDiscovery == NULL) || (std::char_traits<char>::length(_sendDiscovery) == 0))
     {
         sendDiscovery = false;

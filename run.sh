@@ -5,7 +5,7 @@ if bashio::services.available "mqtt"; then
     MQTT_PASSWORD=$(bashio::services "mqtt" "password")
     MQTT_PORT=$(bashio::services "mqtt" "port")
     MQTT_USERNAME=$(bashio::services "mqtt" "username")
-    SEND_DISCOVERY=$(bashio::config "discovery")
+    DISCOVERY=$(bashio::config "discovery")
     DEVICE_ID=$(bashio::config "device_id")
     FREQUENCY=$(bashio::config "frequency")
 else
