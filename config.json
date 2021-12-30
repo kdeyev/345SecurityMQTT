@@ -1,6 +1,6 @@
 {
   "name": "345SecurityMQTT",
-  "version": "0.0.9",
+  "version": "0.1.0",
   "slug": "345securitymqtt",
   "description": "Receive Honeywell wireless sensor data via an SDR dongle",
   "url": "https://github.com/kdeyev/345SecurityMQTT",
@@ -11,7 +11,7 @@
   "usb": true,
   "udev": true,
   "options": {
-    "autodiscovery": false,
+    "autodiscovery": true,
     "device_id": 0,
     "frequency": 345000000
   },
