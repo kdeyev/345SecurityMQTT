@@ -18,6 +18,6 @@ SAMPLE_RATE=$(bashio::config "sample_rate")
 GAIN=$(bashio::config "gain")
 
 echo "Starting 345toMqtt -d $DEVICE_ID -f $FREQUENCY -a $AUTODISCOVERY -g $GAIN -s $SAMPLE_RATE"
-./345toMqtt -d $DEVICE_ID -f $FREQUENCY -a $AUTODISCOVERY -g $GAIN -s $SAMPLE_RATE"
+./345toMqtt -d $DEVICE_ID -f $FREQUENCY -a $AUTODISCOVERY -g $GAIN -s $SAMPLE_RATE
 echo "Exiting run.sh"
 exit $?
