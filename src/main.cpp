@@ -52,13 +52,8 @@ int main(int argc, char ** argv)
         mqttPassword = MQTT_PASSWORD;
     }
 
-    // bool sendDiscovery = true;
-    // const char *_sendDiscovery = std::getenv("DISCOVERY");
-    // if ((_sendDiscovery == NULL) || (std::char_traits<char>::length(_sendDiscovery) == 0))
-    // {
-    //     sendDiscovery = false;
-    // }
-
+    std::cout << "Connecting to " << mqttHost << ":" << mqttPort << std::endl;
+    std::cout << "using username: " << mqttUsername << ":" << mqttPassword << std::endl;
 
     Mqtt mqtt = Mqtt("sensors345", mqttHost, mqttPort, mqttUsername, mqttPassword, "security/sensors345/rx_status", "FAILED");
 
