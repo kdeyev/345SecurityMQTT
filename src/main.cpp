@@ -68,7 +68,7 @@ int main(int argc, char ** argv)
     int freq = 345000000;
     signed char c;
     bool sendDiscovery = false;
-    while ((c = getopt(argc, argv, "hd:f:")) != -1)
+    while ((c = getopt(argc, argv, "hd:f:a:")) != -1)
     {
         switch(c)
         {
