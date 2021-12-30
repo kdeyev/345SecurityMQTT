@@ -12,7 +12,6 @@
 #include <sys/time.h>
 #include <cstdlib>
 #include <string>
-#include <sstream>
 
 // TODO: MQTT Will doesn't seem to be working with HA as expected
 
@@ -89,7 +88,7 @@ int main(int argc, char ** argv)
             }
             case 'a':
             {
-                std::istringstream(optarg) >> sendDiscovery;
+                sendDiscovery = std::string(optarg) == "true";
                 break;
             }
             default: // including '?' unknown character
