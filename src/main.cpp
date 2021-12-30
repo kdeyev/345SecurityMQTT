@@ -59,6 +59,8 @@ int main(int argc, char ** argv)
         sendDiscovery = false;
     }
 
+    std::cout << "Discovery messages are " << (sendDiscovery ? "enabled" : "disabled") << std::endl;
+
     Mqtt mqtt = Mqtt("sensors345", mqttHost, mqttPort, mqttUsername, mqttPassword, "security/sensors345/rx_status", "FAILED");
     DigitalDecoder dDecoder = DigitalDecoder(mqtt, sendDiscovery);
     AnalogDecoder aDecoder;

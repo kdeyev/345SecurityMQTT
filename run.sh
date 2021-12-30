@@ -11,6 +11,7 @@ if bashio::services.available "mqtt"; then
 else
     bashio::log.info "The mqtt addon is not available."
     bashio::log.info "Manually update the output line in the configuration file with mqtt connection settings, and restart the addon."
+    exit $?
 fi
 
 echo "Starting 345toMqtt -d $DEVICE_ID -f $FREQUENCY"
