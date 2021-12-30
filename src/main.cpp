@@ -52,10 +52,12 @@ int main(int argc, char ** argv)
         mqttPassword = MQTT_PASSWORD;
     }
 
-    bool sendDiscovery = false;
+    bool sendDiscovery;
     const char *_sendDiscovery = std::getenv("SEND_DISCOVERY");
     if ((_sendDiscovery == NULL) || (std::char_traits<char>::length(_sendDiscovery) == 0))
     {
+        sendDiscovery = false;
+    } else {
         sendDiscovery = true;
     }
 
