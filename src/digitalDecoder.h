@@ -10,7 +10,7 @@
 class DigitalDecoder
 {
   public:
-    DigitalDecoder(Mqtt &mqtt_init) : mqtt(mqtt_init) {}
+    DigitalDecoder(Mqtt &mqtt_init, bool send_discovery=false) : mqtt(mqtt_init), sendDiscovery(send_discovery) {}
 
     void handleData(char data);
     void setRxGood(bool state);
@@ -30,6 +30,8 @@ protected:
     void handleBit(bool value);
     void decodeBit(bool value);
     void checkForTimeouts();
+
+    bool sendDiscovery = false;
 
     unsigned int samplesSinceEdge = 0;
     bool lastSample = false;
@@ -65,8 +67,6 @@ protected:
     std::map<uint32_t, sensorState_t> sensorStatusMap;
     std::map<uint32_t, keypadState_t> keypadStatusMap;
     uint64_t lastKeyfobPayload;
-
-    // std::string discoveryPrefix;
 };
 
 #endif

@@ -51,9 +51,16 @@ int main(int argc, char ** argv)
     {
         mqttPassword = MQTT_PASSWORD;
     }
-    
+
+    bool sendDiscovery = false;
+    const char *_sendDiscovery = std::getenv("SEND_DISCOVERY");
+    if ((_sendDiscovery == NULL) || (std::char_traits<char>::length(_sendDiscovery) == 0))
+    {
+        sendDiscovery = true;
+    }
+
     Mqtt mqtt = Mqtt("sensors345", mqttHost, mqttPort, mqttUsername, mqttPassword, "security/sensors345/rx_status", "FAILED");
-    DigitalDecoder dDecoder = DigitalDecoder(mqtt);
+    DigitalDecoder dDecoder = DigitalDecoder(mqtt, sendDiscovery);
     AnalogDecoder aDecoder;
     
     int devId = 0;

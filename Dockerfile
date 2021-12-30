@@ -1,4 +1,7 @@
-FROM resin/%%RESIN_MACHINE_NAME%%-debian:stretch AS build
+ARG BUILD_FROM=homeassistant/amd64-base-debian
+FROM ${BUILD_FROM} AS build
+
+# FROM resin/%%RESIN_MACHINE_NAME%%-debian:stretch AS build
 
 # Install build tools and remove apt-cache afterwards
 RUN apt-get -q update && apt-get install -yq --no-install-recommends \
@@ -12,16 +15,22 @@ COPY . /usr/src/app/345SecurityMQTT
 WORKDIR /usr/src/app/345SecurityMQTT/src
 RUN ./build.sh
 
-FROM resin/%%RESIN_MACHINE_NAME%%-debian:stretch
+FROM $BUILD_FROM
 
 RUN apt-get -q update && apt-get install -yq --no-install-recommends \
 	librtlsdr-dev rtl-sdr libmosquittopp-dev \
 	&& apt-get clean && rm -rf /var/lib/apt/lists/*
 
-COPY --from=build /usr/src/app/345SecurityMQTT/src/345toMqtt 345toMqtt
+COPY --from=build /usr/src/app/345SecurityMQTT/src/345toMqtt /345toMqtt
 
 #switch on systemd init system in container
 ENV INITSYSTEM on
 
 # Run our binary on container startup
-CMD ./345toMqtt
+# CMD ./345toMqtt
+
+# Run script
+COPY run.sh /
+RUN chmod a+x /run.sh
+
+CMD [ "/run.sh" ]

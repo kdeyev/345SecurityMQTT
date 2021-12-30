@@ -349,8 +349,10 @@ void DigitalDecoder::updateSensorState(uint32_t serial, uint64_t payload)
     bool supervised = (payload & 0x000000040000) && ((currentState.lastUpdateTime - lastState.lastUpdateTime) > 2);
 
 
-    if (supervised || (currentState.lastUpdateTime - lastState.lastUpdateTime > 2)) {
-        this->sendSensorDiscovery(serial);
+    if (this->sendDiscovery) {
+        if (supervised || (currentState.lastUpdateTime - lastState.lastUpdateTime > 2)) {
+            this->sendSensorDiscovery(serial);
+        }
     }
 
     if ((currentState.loop1 != lastState.loop1) || supervised)

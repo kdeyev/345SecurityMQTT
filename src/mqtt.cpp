@@ -40,7 +40,7 @@ Mqtt::Mqtt(const char * _id, const char * _host, int _port, const char * _userna
 };
 
 Mqtt::~Mqtt() {
-    loop_stop();
+    // loop_stop();
     mosqpp::lib_cleanup();
 }
 
