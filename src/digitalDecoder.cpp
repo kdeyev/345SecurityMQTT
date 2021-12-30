@@ -37,7 +37,6 @@
 #define LOOP1_NAME "loop1"
 #define LOOP2_NAME "loop2"
 #define LOOP3_NAME "loop3"
-#define LOOP4_NAME "loop4"
 #define TAMPER_NAME "tamper"
 #define BATTERY_NAME "battery"
 #define HB_NAME "hb"
@@ -273,7 +272,6 @@ void DigitalDecoder::sendSensorsDiscovery(uint32_t serial)
     sendSensorDiscovery(serial, LOOP1_NAME, "opening", OPEN_SENSOR_MSG, CLOSED_SENSOR_MSG);
     sendSensorDiscovery(serial, LOOP2_NAME, "opening", OPEN_SENSOR_MSG, CLOSED_SENSOR_MSG);
     sendSensorDiscovery(serial, LOOP3_NAME, "opening", OPEN_SENSOR_MSG, CLOSED_SENSOR_MSG);
-    sendSensorDiscovery(serial, LOOP4_NAME, "opening", OPEN_SENSOR_MSG, CLOSED_SENSOR_MSG);
 
     sendSensorDiscovery(serial, TAMPER_NAME, "safety", TAMPER_MSG, UNTAMPERED_MSG, true);
     

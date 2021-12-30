@@ -1,6 +1,8 @@
-# 345SecurityMQTT
+# Home Assistant add-on for 345SecurityMQTT with Auto Discovery support
 
-This project is based [jlt24's 345SecurityMQTT](https://github.com/jlt24/345SecurityMQTT) project which is based on [fusterjj's HonewellSecurityMQTT](https://github.com/fusterjj/HoneywellSecurityMQTT) project which was based on [jhaines0's HoneywellSecurity](https://github.com/jhaines0/HoneywellSecurity).  It listen's for events from 345MHz security sensors and sends messages via MQTT.  
+This project is based [jeffproe's 345SecurityMQTT](https://github.com/jeffproe/345SecurityMQTT) project which is based [jlt24's 345SecurityMQTT](https://github.com/jlt24/345SecurityMQTT) project which is based on [fusterjj's HonewellSecurityMQTT](https://github.com/fusterjj/HoneywellSecurityMQTT) project which was based on [jhaines0's HoneywellSecurity](https://github.com/jhaines0/HoneywellSecurity). Welcome to the open-source community :-).
+
+It listen's for events from 345MHz security sensors and sends messages via MQTT. 
 
 It is a simple event/message translation, but some state/persistance was required to acheive debouncing of signals.
 
@@ -11,6 +13,23 @@ It is a simple event/message translation, but some state/persistance was require
  - Reports alarm and sensor status to an MQTT broker
  - Support for multisensors.  For example, a water sensor with high-temp and low-temp alerts.
  - Support for some 345 keyfobs and 345 keypads.
+
+## Home Assistant add-on 
+* [How to add this add-on repository to your Home Assistant install](https://home-assistant.io/hassio/installing_third_party_addons/)
+
+## MQTT Auto Discovery
+You don't really need to do anything special for allowing the Auto Discovery messages: the Auto Discovery feature is enabled in the Home Assistant add-on.
+
+Pay attention that each device will be discovered with multiple sensors:
+- loo1-loop3: opening sensors. You'll need to identify which of them need to be used for your device.
+- tamper: safety sensor
+- battery: battery sensor. Binary sensor with notifies about low battery level
+- heartbeat: connectivity sensor. HB sensor expects to get a ping message at least once in 75 minutes.
+
+keyfob anf keyfob are not supported with MQTT Auto Discovery yet
+
+For more information about MQTT Auto Discovery see [documentation](https://www.home-assistant.io/integrations/#search/mqtt) and search the [HA forum](https://community.home-assistant.io/search?q=mqtt%20sensor).
+
 
 ## Requirements
  - RTL-SDR USB adapter; commonly available on Amazon
@@ -46,10 +65,11 @@ Modify `mqtt_config.h` to specify the host, port, username, and password of your
   `./345toMqtt`
 
 #### Command line flags
-| Flag          | Meaning   | Default    |
-|---------------|-----------|------------|
-| `-d` <int>    | Device id | 0          |
-| `-f` <int>    | Frequency | 345000000  |
+| Flag          | Meaning        | Default    |
+|---------------|----------------|------------|
+| `-d` <int>    | Device id      | 0          |
+| `-f` <int>    | Frequency      | 345000000  |
+| `-a` <bool>   | Auto Discovery | false      |
 
 #### Environment variables
 
