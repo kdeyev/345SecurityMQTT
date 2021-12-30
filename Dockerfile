@@ -19,7 +19,7 @@ FROM $BUILD_FROM
 
 RUN apk add --no-cache libusb \
     librtlsdr \
-	mosquitto
+	mosquitto-libs++
 
 COPY --from=build /usr/src/app/345SecurityMQTT/src/345toMqtt /345toMqtt
 
