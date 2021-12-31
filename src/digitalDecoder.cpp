@@ -30,7 +30,7 @@
 #define RX_GOOD_MIN_SEC (60)
 #define UPDATE_MIN_SEC (60)
 
-#define BASE_NAME "sensors345"
+#define BASE_NAME std::string("sensors345")
 #define BASE_TOPIC "security/sensors345/"
 #define SENSOR_TOPIC BASE_TOPIC"sensor/"
 #define KEYFOB_TOPIC BASE_TOPIC"keyfob/"
@@ -241,7 +241,7 @@ void DigitalDecoder::updateKeypadState(uint32_t serial, uint64_t payload)
     }
 }
 
-void DigitalDecoder::sendSensorDiscovery(const serial, const std::string& manufacturer, const std::string& model,  const std::string& nameSuffix, const std::string& suffix, 
+void DigitalDecoder::sendSensorDiscovery(const uint32_t serial, const std::string& manufacturer, const std::string& model,  const std::string& nameSuffix, const std::string& suffix, 
                                          const std::string& device_class, const std::string& payload_on, const std::string& payload_off, bool force_update, int expire_after) {
     timeval now;
     gettimeofday(&now, nullptr);
@@ -264,7 +264,7 @@ void DigitalDecoder::sendSensorDiscovery(const serial, const std::string& manufa
         if (expire_after) {
             addKeyValue(message, "expire_after", expire_after);
         }
-        addKeyValue(message, "unique_id", BASE_NAME + "-" + serial  + "-" + suffix));
+        addKeyValue(message, "unique_id", BASE_NAME + "-" + serialStr  + "-" + suffix);
         if (payload_on.size()) {
             addKeyValue(message, "payload_on", payload_on);
         }
@@ -272,8 +272,8 @@ void DigitalDecoder::sendSensorDiscovery(const serial, const std::string& manufa
             addKeyValue(message, "payload_off", payload_off);
         }
         message << "\"device\": {" ;
-        addKeyValue(message, "identifiers", BASE_NAME + "-" + , serial));
-        addKeyValue(message, "name", manufacturer + "-" + model + "-" + serialStr));
+        addKeyValue(message, "identifiers", BASE_NAME + "-" + serialStr);
+        addKeyValue(message, "name", manufacturer + "-" + model + "-" + serialStr);
         addKeyValue(message, "model", model);
         addKeyValue(message, "manufacturer", manufacturer, false);
         message << "}";
@@ -286,14 +286,15 @@ void DigitalDecoder::sendSensorDiscovery(const serial, const std::string& manufa
 
 void DigitalDecoder::sendSensorsDiscovery(uint32_t serial, uint32_t manufacturer_code, uint64_t typ)
 {
-    const std::string manufacturer = BASE_NAME;
-    std::string model = "Sensor";
+    std::string manufacturer = BASE_NAME;
+    std::string model = BASE_NAME;
     if (manufacturer_code == MANUFACTURER_CODE_HONEYWELL) {
         manufacturer = "Honeywell";
-        if (typ = 84) {
+        if (typ == 84) {
             model = "Opening Sensor";
-            sendSensorDiscovery(serial, manufacturer, model, "Opening", LOOP1_NAME, "opening", OPEN_SENSOR_MSG, CLOSED_SENSOR_MSG);
-        if (typ = 12) {
+            sendSensorDiscovery(serial, manufacturer, model, "opening", LOOP1_NAME, "opening", OPEN_SENSOR_MSG, CLOSED_SENSOR_MSG);
+        }
+        else if (typ == 12) {
             model = "Glass Break Sensor";
             sendSensorDiscovery(serial, manufacturer, model, LOOP1_NAME, LOOP1_NAME, "opening", OPEN_SENSOR_MSG, CLOSED_SENSOR_MSG);
             sendSensorDiscovery(serial, manufacturer, model, LOOP2_NAME, LOOP2_NAME, "opening", OPEN_SENSOR_MSG, CLOSED_SENSOR_MSG);

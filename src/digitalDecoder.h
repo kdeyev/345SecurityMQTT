@@ -22,9 +22,9 @@ protected:
   private:
 
     void sendSensorsDiscovery(uint32_t serial, uint32_t manufacturer_code, uint64_t typ);
-    void sendSensorDiscovery(uint32_t serial, const std::string& manufacturer, const std::string& model, const std::string& suffix, const std::string& device_class,
-                             const std::string& payload_on, const std::string& payload_off, bool force_update=false, int expire_after=0);
-    void updateSensorState(uint32_t serial, uint32_t manufacturer_code, uint64_t typ,  uint64_t payload);
+    void sendSensorDiscovery(const uint32_t serial, const std::string& manufacturer, const std::string& model,  const std::string& nameSuffix, const std::string& suffix, 
+                                         const std::string& device_class, const std::string& payload_on, const std::string& payload_off, bool force_update=false, int expire_after=0);
+    void updateSensorState(uint32_t serial, uint32_t manufacturer_code, uint64_t typ, uint64_t payload);
     void updateKeypadState(uint32_t serial, uint64_t payload);
     void updateKeyfobState(uint32_t serial, uint64_t payload);
     void handlePayload(uint64_t payload);
