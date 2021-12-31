@@ -13,6 +13,9 @@
 #include <stdint.h>
 #include <csignal>
 
+// #include <algorithm>
+// #include <cctype>
+// #include <string>
 
 // Pulse checks seem to be about 60-70 minutes apart
 #define RX_TIMEOUT_MIN      (90)
@@ -45,6 +48,11 @@
 #define UPDATE_INTERVAL 2
 #define SENSOR_EXPIRATION 4500
 
+#define MANUFACTURER_CODE_UNKNOWN 0
+#define MANUFACTURER_CODE_HONEYWELL 1
+#define MANUFACTURER_CODE_VIVINT 2
+#define MANUFACTURER_CODE_2GIG 3
+
 void addKeyValue(std::ostringstream& stream, const std::string& key, const std::string& value, bool comma=true) {
     stream << "\"" << key << "\": \"" << value << "\"";
     if (comma) {
@@ -59,6 +67,13 @@ void addKeyValue(std::ostringstream& stream, const std::string& key, const int& 
     }
 }
 
+// std::string toLower(std::string data) 
+// {
+//     std::transform(data.begin(), data.end(), data.begin(),
+//         [](unsigned char c){ return std::tolower(c); });
+//     return data;
+// }
+
 std::string getDiscoveryTopic(uint32_t serial, const std::string& suffix) {
     std::ostringstream topic;
     topic << AUTODISCOVERY_TOPIC << serial << "/" << BASE_NAME << "-" << serial << "-" << suffix << "/config";
@@ -71,15 +86,15 @@ std::string getSensorTopic(uint32_t serial, const std::string& suffix) {
     return topic.str();
 }
 
-std::string getDeviceName(uint32_t serial) {
+std::string getDeviceName(const std::string& manufacturer, uint32_t serial) {
     std::ostringstream topic;
-    topic << BASE_NAME << "-" << serial;
+    topic << manufacturer << "-" << serial;
     return topic.str();
 }
 
-std::string getSensorName(uint32_t serial, const std::string& suffix) {
+std::string getSensorName(const std::string& manufacturer, uint32_t serial, const std::string& suffix) {
     std::ostringstream topic;
-    topic << BASE_NAME << "-" << serial << "-" << suffix;
+    topic << manufacturer << "-" << serial << "-" << suffix;
     return topic.str();
 }
 
@@ -226,11 +241,13 @@ void DigitalDecoder::updateKeypadState(uint32_t serial, uint64_t payload)
     }
 }
 
-void DigitalDecoder::sendSensorDiscovery(uint32_t serial, const std::string& suffix, const std::string& device_class,
-                                         const std::string& payload_on, const std::string& payload_off, bool force_update, int expire_after) {
+void DigitalDecoder::sendSensorDiscovery(const serial, const std::string& manufacturer, const std::string& model,  const std::string& nameSuffix, const std::string& suffix, 
+                                         const std::string& device_class, const std::string& payload_on, const std::string& payload_off, bool force_update, int expire_after) {
     timeval now;
     gettimeofday(&now, nullptr);
     uint64_t currentTime = now.tv_sec;
+
+    std::string serialStr = std::to_string(serial);
 
     std::string topic = getDiscoveryTopic(serial, suffix);
 
@@ -238,7 +255,7 @@ void DigitalDecoder::sendSensorDiscovery(uint32_t serial, const std::string& suf
     if (found == autoDiscoveryTime.end() || currentTime - found->second >= AUTODISCOVERY_INTERVAL) {
         std::ostringstream message;
         message << "{";
-        addKeyValue(message, "name", getDeviceName(serial) + "-" + suffix);
+        addKeyValue(message, "name", manufacturer + "-" + model + "-" +  serialStr + "-" + nameSuffix);
         addKeyValue(message, "state_topic", getSensorTopic(serial, suffix));
         addKeyValue(message, "device_class", device_class);
         if (force_update) {
@@ -247,7 +264,7 @@ void DigitalDecoder::sendSensorDiscovery(uint32_t serial, const std::string& suf
         if (expire_after) {
             addKeyValue(message, "expire_after", expire_after);
         }
-        addKeyValue(message, "unique_id", getSensorName(serial, suffix));
+        addKeyValue(message, "unique_id", BASE_NAME + "-" + serial  + "-" + suffix));
         if (payload_on.size()) {
             addKeyValue(message, "payload_on", payload_on);
         }
@@ -255,10 +272,10 @@ void DigitalDecoder::sendSensorDiscovery(uint32_t serial, const std::string& suf
             addKeyValue(message, "payload_off", payload_off);
         }
         message << "\"device\": {" ;
-        addKeyValue(message, "identifiers", getDeviceName(serial));
-        addKeyValue(message, "name", getDeviceName(serial));
-        addKeyValue(message, "model", BASE_NAME);
-        addKeyValue(message, "manufacturer", BASE_NAME, false);
+        addKeyValue(message, "identifiers", BASE_NAME + "-" + , serial));
+        addKeyValue(message, "name", manufacturer + "-" + model + "-" + serialStr));
+        addKeyValue(message, "model", model);
+        addKeyValue(message, "manufacturer", manufacturer, false);
         message << "}";
         message << "}";
 
@@ -267,23 +284,45 @@ void DigitalDecoder::sendSensorDiscovery(uint32_t serial, const std::string& suf
     }
 }
 
-void DigitalDecoder::sendSensorsDiscovery(uint32_t serial)
+void DigitalDecoder::sendSensorsDiscovery(uint32_t serial, uint32_t manufacturer_code, uint64_t typ)
 {
-    sendSensorDiscovery(serial, LOOP1_NAME, "opening", OPEN_SENSOR_MSG, CLOSED_SENSOR_MSG);
-    sendSensorDiscovery(serial, LOOP2_NAME, "opening", OPEN_SENSOR_MSG, CLOSED_SENSOR_MSG);
-    sendSensorDiscovery(serial, LOOP3_NAME, "opening", OPEN_SENSOR_MSG, CLOSED_SENSOR_MSG);
+    const std::string manufacturer = BASE_NAME;
+    std::string model = "Sensor";
+    if (manufacturer_code == MANUFACTURER_CODE_HONEYWELL) {
+        manufacturer = "Honeywell";
+        if (typ = 84) {
+            model = "Opening Sensor";
+            sendSensorDiscovery(serial, manufacturer, model, "Opening", LOOP1_NAME, "opening", OPEN_SENSOR_MSG, CLOSED_SENSOR_MSG);
+        if (typ = 12) {
+            model = "Glass Break Sensor";
+            sendSensorDiscovery(serial, manufacturer, model, LOOP1_NAME, LOOP1_NAME, "opening", OPEN_SENSOR_MSG, CLOSED_SENSOR_MSG);
+            sendSensorDiscovery(serial, manufacturer, model, LOOP2_NAME, LOOP2_NAME, "opening", OPEN_SENSOR_MSG, CLOSED_SENSOR_MSG);
+            sendSensorDiscovery(serial, manufacturer, model, LOOP3_NAME, LOOP3_NAME, "opening", OPEN_SENSOR_MSG, CLOSED_SENSOR_MSG); 
+        } else {
+            sendSensorDiscovery(serial, manufacturer, model, LOOP1_NAME, LOOP1_NAME, "opening", OPEN_SENSOR_MSG, CLOSED_SENSOR_MSG);
+            sendSensorDiscovery(serial, manufacturer, model, LOOP2_NAME, LOOP2_NAME, "opening", OPEN_SENSOR_MSG, CLOSED_SENSOR_MSG);
+            sendSensorDiscovery(serial, manufacturer, model, LOOP3_NAME, LOOP3_NAME, "opening", OPEN_SENSOR_MSG, CLOSED_SENSOR_MSG); 
+        }
+        
+        
+    } else {
+        manufacturer = BASE_NAME;
+        sendSensorDiscovery(serial, manufacturer, model, LOOP1_NAME, LOOP1_NAME, "opening", OPEN_SENSOR_MSG, CLOSED_SENSOR_MSG);
+        sendSensorDiscovery(serial, manufacturer, model, LOOP2_NAME, LOOP2_NAME, "opening", OPEN_SENSOR_MSG, CLOSED_SENSOR_MSG);
+        sendSensorDiscovery(serial, manufacturer, model, LOOP3_NAME, LOOP3_NAME, "opening", OPEN_SENSOR_MSG, CLOSED_SENSOR_MSG); 
+    }
 
-    sendSensorDiscovery(serial, TAMPER_NAME, "safety", TAMPER_MSG, UNTAMPERED_MSG, true);
+    sendSensorDiscovery(serial, manufacturer, model, TAMPER_NAME, TAMPER_NAME, "safety", TAMPER_MSG, UNTAMPERED_MSG, true);
     
-    sendSensorDiscovery(serial, BATTERY_NAME, "battery", LOW_BAT_MSG, OK_BAT_MSG);
+    sendSensorDiscovery(serial, manufacturer, model, BATTERY_NAME, BATTERY_NAME, "battery", LOW_BAT_MSG, OK_BAT_MSG);
     
-    sendSensorDiscovery(serial, HB_NAME, "connectivity", "PING", "", true, SENSOR_EXPIRATION);
+    sendSensorDiscovery(serial, manufacturer, model, HB_NAME, HB_NAME, "connectivity", "PING", "", true, SENSOR_EXPIRATION);
 }
 
-void DigitalDecoder::updateSensorState(uint32_t serial, uint64_t payload)
+void DigitalDecoder::updateSensorState(uint32_t serial, uint32_t manufacturer_code, uint64_t typ, uint64_t payload)
 {
     if (this->sendDiscovery) {
-        this->sendSensorsDiscovery(serial);
+        this->sendSensorsDiscovery(serial, manufacturer_code, typ);
     }
 
     timeval now;
@@ -392,16 +431,23 @@ void DigitalDecoder::updateSensorState(uint32_t serial, uint64_t payload)
 //     }
 // }
 
-bool DigitalDecoder::isPayloadValid(uint64_t payload, uint64_t polynomial) const
+bool DigitalDecoder::isPayloadValid(uint64_t payload, uint64_t polynomial) const 
+{
+    uint32_t manufacturer_code = 0;
+    return isPayloadValid(payload, polynomial);
+}
+
+bool DigitalDecoder::isPayloadValid(uint64_t payload, uint64_t polynomial, uint32_t& manufacturer_code) const
 {
     uint64_t sof = (payload & 0xF00000000000) >> 44;
     uint64_t ser = (payload & 0x0FFFFF000000) >> 24;
-    uint64_t typ = (payload & 0x000000FF0000) >> 16;
+    // uint64_t typ = (payload & 0x000000FF0000) >> 16;
     uint64_t crc = (payload & 0x00000000FFFF) >>  0;
 
     //
     // Check CRC
     //
+    manufacturer_code = MANUFACTURER_CODE_UNKNOWN;
     if (polynomial == 0)
     {
         if (sof == 0x2 /* 2gig smoke */ 
@@ -414,6 +460,7 @@ bool DigitalDecoder::isPayloadValid(uint64_t payload, uint64_t polynomial) const
             || sof == 0xC /* 2gig Tilt */ 
             || sof == 0xF /* Remote keyfob */) {
             // 2GIG brand
+            manufacturer_code = MANUFACTURER_CODE_2GIG;
             #ifdef __arm__
             printf("2GIG Sensor %llu/0x%llX", sof, sof);
             #else
@@ -422,10 +469,12 @@ bool DigitalDecoder::isPayloadValid(uint64_t payload, uint64_t polynomial) const
             polynomial = 0x18050;
         } else if (sof == 0x8) {
             // Honeywell Sensor
+            manufacturer_code = MANUFACTURER_CODE_HONEYWELL;
             printf("Honeywell Sensor");
             polynomial = 0x18005;
         } else if (sof == 0xD || sof == 0xE) {
             // Vivint
+            manufacturer_code = MANUFACTURER_CODE_VIVINT;
             #ifdef __arm__
             printf("Vivint Sensor %llu/0x%llX", sof, sof);
             #else
@@ -467,7 +516,8 @@ void DigitalDecoder::handlePayload(uint64_t payload)
     uint64_t ser = (payload & 0x0FFFFF000000) >> 24;
     uint64_t typ = (payload & 0x000000FF0000) >> 16; 
 
-    const bool validSensorPacket = isPayloadValid(payload);
+    uint32_t manufacturer_code = MANUFACTURER_CODE_UNKNOWN;
+    const bool validSensorPacket = isPayloadValid(payload, 0, manufacturer_code);
     const bool validKeypadPacket = isPayloadValid(payload, 0x18050) && (typ & 0x01);
     const bool validKeyfobPacket = isPayloadValid(payload, 0x18050) && (typ & 0x02);
 
@@ -497,7 +547,7 @@ void DigitalDecoder::handlePayload(uint64_t payload)
         // We received a valid packet so the receiver must be working
         setRxGood(true);
         // Update the device
-        updateSensorState(ser, payload);
+        updateSensorState(ser, manufacturer_code, typ, payload);
     }
     else if (validKeypadPacket)
     {
