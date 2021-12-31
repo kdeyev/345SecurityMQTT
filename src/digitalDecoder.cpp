@@ -290,9 +290,9 @@ void DigitalDecoder::sendSensorsDiscovery(uint32_t serial, uint32_t manufacturer
     std::string model = BASE_NAME;
     if (manufacturer_code == MANUFACTURER_CODE_HONEYWELL) {
         manufacturer = "Honeywell";
-        if (typ == 84) {
+        if (typ == 132) {
             model = "Opening Sensor";
-            sendSensorDiscovery(serial, manufacturer, model, "opening", LOOP1_NAME, "opening", OPEN_SENSOR_MSG, CLOSED_SENSOR_MSG);
+            sendSensorDiscovery(serial, manufacturer, model, "opening", LOOP2_NAME, "opening", OPEN_SENSOR_MSG, CLOSED_SENSOR_MSG);
         }
         else if (typ == 12) {
             model = "Glass Break Sensor";
@@ -435,7 +435,7 @@ void DigitalDecoder::updateSensorState(uint32_t serial, uint32_t manufacturer_co
 bool DigitalDecoder::isPayloadValid(uint64_t payload, uint64_t polynomial) const 
 {
     uint32_t manufacturer_code = 0;
-    return isPayloadValid(payload, polynomial);
+    return isPayloadValid(payload, polynomial, manufacturer_code);
 }
 
 bool DigitalDecoder::isPayloadValid(uint64_t payload, uint64_t polynomial, uint32_t& manufacturer_code) const
