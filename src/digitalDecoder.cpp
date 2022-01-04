@@ -294,11 +294,9 @@ void DigitalDecoder::sendSensorsDiscovery(uint32_t serial, uint32_t manufacturer
             model = "Opening Sensor";
             sendSensorDiscovery(serial, manufacturer, model, "opening", LOOP2_NAME, "opening", OPEN_SENSOR_MSG, CLOSED_SENSOR_MSG);
         }
-        else if (typ == 12) {
+        else if (typ == 12 || typ == 4) {
             model = "Glass Break Sensor";
-            sendSensorDiscovery(serial, manufacturer, model, LOOP1_NAME, LOOP1_NAME, "opening", OPEN_SENSOR_MSG, CLOSED_SENSOR_MSG);
-            sendSensorDiscovery(serial, manufacturer, model, LOOP2_NAME, LOOP2_NAME, "opening", OPEN_SENSOR_MSG, CLOSED_SENSOR_MSG);
-            sendSensorDiscovery(serial, manufacturer, model, LOOP3_NAME, LOOP3_NAME, "opening", OPEN_SENSOR_MSG, CLOSED_SENSOR_MSG); 
+            sendSensorDiscovery(serial, manufacturer, model, "opening", LOOP1_NAME, "opening", OPEN_SENSOR_MSG, CLOSED_SENSOR_MSG);
         } else {
             sendSensorDiscovery(serial, manufacturer, model, LOOP1_NAME, LOOP1_NAME, "opening", OPEN_SENSOR_MSG, CLOSED_SENSOR_MSG);
             sendSensorDiscovery(serial, manufacturer, model, LOOP2_NAME, LOOP2_NAME, "opening", OPEN_SENSOR_MSG, CLOSED_SENSOR_MSG);
