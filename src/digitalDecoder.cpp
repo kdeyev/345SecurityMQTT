@@ -284,17 +284,17 @@ void DigitalDecoder::sendSensorDiscovery(const uint32_t serial, const std::strin
     }
 }
 
-void DigitalDecoder::sendSensorsDiscovery(uint32_t serial, uint32_t manufacturer_code, uint64_t typ)
+void DigitalDecoder::sendSensorsDiscovery(uint32_t serial, uint32_t manufacturer_code, const sensorState_t& state)
 {
     std::string manufacturer = BASE_NAME;
     std::string model = BASE_NAME;
     if (manufacturer_code == MANUFACTURER_CODE_HONEYWELL) {
         manufacturer = "Honeywell";
-        if (typ == 132) {
-            model = "Opening Sensor";
+        if (state.loop1 && !state.loop3) {
+            model = "Contact Sensor";
             sendSensorDiscovery(serial, manufacturer, model, "opening", LOOP2_NAME, "opening", OPEN_SENSOR_MSG, CLOSED_SENSOR_MSG);
         }
-        else if (typ == 12 || typ == 4) {
+        else if (!state.loop1 && !state.loop3) {
             model = "Glass Break Sensor";
             sendSensorDiscovery(serial, manufacturer, model, "opening", LOOP1_NAME, "opening", OPEN_SENSOR_MSG, CLOSED_SENSOR_MSG);
         } else {
@@ -318,12 +318,8 @@ void DigitalDecoder::sendSensorsDiscovery(uint32_t serial, uint32_t manufacturer
     sendSensorDiscovery(serial, manufacturer, model, HB_NAME, HB_NAME, "connectivity", "PING", "", true, SENSOR_EXPIRATION);
 }
 
-void DigitalDecoder::updateSensorState(uint32_t serial, uint32_t manufacturer_code, uint64_t typ, uint64_t payload)
+void DigitalDecoder::updateSensorState(uint32_t serial, uint32_t manufacturer_code, uint64_t payload)
 {
-    if (this->sendDiscovery) {
-        this->sendSensorsDiscovery(serial, manufacturer_code, typ);
-    }
-
     timeval now;
     gettimeofday(&now, nullptr);
 
@@ -343,6 +339,10 @@ void DigitalDecoder::updateSensorState(uint32_t serial, uint32_t manufacturer_co
     // bool repeated = payload & 0x000000020000;
 
     //std::cout << "Payload:" << std::hex << payload << " Serial:" << std::dec << serial << std::boolalpha << " Loop1:" << currentState.loop1 << std::endl;
+
+    if (this->sendDiscovery) {
+        this->sendSensorsDiscovery(serial, manufacturer_code, currentState);
+    }
 
     auto found = sensorStatusMap.find(serial);
     if (found == sensorStatusMap.end())
@@ -546,7 +546,7 @@ void DigitalDecoder::handlePayload(uint64_t payload)
         // We received a valid packet so the receiver must be working
         setRxGood(true);
         // Update the device
-        updateSensorState(ser, manufacturer_code, typ, payload);
+        updateSensorState(ser, manufacturer_code, payload);
     }
     else if (validKeypadPacket)
     {
