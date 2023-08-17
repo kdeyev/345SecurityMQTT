@@ -1,6 +1,6 @@
 {
   "name": "345SecurityMQTT",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "init": false,
   "slug": "345securitymqtt",
   "description": "345SecurityMQTT with Auto Discovery support. It listen's for events from 345MHz security sensors and sends messages via MQTT.",
@@ -8,9 +8,13 @@
   "arch": ["armhf", "armv7", "aarch64", "amd64", "i386"],
   "startup": "application",
   "boot": "auto",
-  "services": ["mqtt:want"],
+  "services": ["mqtt:need"],
   "usb": true,
   "udev": true,
+  "uart": true,
+  "host_network": false,
+  "hassio_api": true,
+  "map": ["config:rw"],
   "options": {
     "autodiscovery": true,
     "device_id": 0,
