@@ -104,6 +104,7 @@ int main(int argc, char ** argv)
     }
     
     std::cout << "Discovery messages are " << (sendDiscovery ? "enabled" : "disabled") << std::endl;
+    std::cout << "Device ID: " << devId << std::endl;
     DigitalDecoder dDecoder = DigitalDecoder(mqtt, sendDiscovery);
     AnalogDecoder aDecoder;
 
@@ -120,7 +121,7 @@ int main(int argc, char ** argv)
         
     if(rtlsdr_open(&dev, devId) < 0)
     {
-        std::cout << "Failed to open device" << std::endl;
+        std::cout << "Failed to open device ID: " << devId << std::endl;
         return -1;
     }
     
