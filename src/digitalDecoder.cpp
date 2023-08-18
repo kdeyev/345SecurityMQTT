@@ -461,31 +461,31 @@ bool DigitalDecoder::isPayloadValid(uint64_t payload, uint64_t polynomial, uint3
             // 2GIG brand
             manufacturer_code = MANUFACTURER_CODE_2GIG;
             #ifdef __arm__
-            printf("2GIG Sensor %llu/0x%llX", sof, sof);
+            //printf("2GIG Sensor %llu/0x%llX", sof, sof);
             #else
-            printf("2GIG Sensor %lu/0x%lX", sof, sof);
+            //printf("2GIG Sensor %lu/0x%lX", sof, sof);
             #endif
             polynomial = 0x18050;
         } else if (sof == 0x8) {
             // Honeywell Sensor
             manufacturer_code = MANUFACTURER_CODE_HONEYWELL;
-            printf("Honeywell Sensor");
+            //printf("Honeywell Sensor");
             polynomial = 0x18005;
         } else if (sof == 0xD || sof == 0xE) {
             // Vivint
             manufacturer_code = MANUFACTURER_CODE_VIVINT;
             #ifdef __arm__
-            printf("Vivint Sensor %llu/0x%llX", sof, sof);
+            //printf("Vivint Sensor %llu/0x%llX", sof, sof);
             #else
-            printf("Vivint Sensor %lu/0x%lX", sof, sof);
+            //printf("Vivint Sensor %lu/0x%lX", sof, sof);
             #endif
             polynomial = 0x18050; // Don't know if this is correct
         } else {
             // Something else?
             #ifdef __arm__
-            printf("Unknown Brans Sensor %llu/0x%llX", sof, sof);
+            //printf("Unknown Brans Sensor %llu/0x%llX", sof, sof);
             #else
-            printf("Unknown Brand Sensor %lu/0x%lX", sof, sof);
+            //printf("Unknown Brand Sensor %lu/0x%lX", sof, sof);
             #endif
             polynomial = 0x18050;
         }
@@ -523,11 +523,11 @@ void DigitalDecoder::handlePayload(uint64_t payload)
     //
     // Print Packet
     //
- #ifdef __arm__
-    printf("%s Payload: %llX (Serial %llu/%llX, Status %llX)\n", (validSensorPacket | validKeypadPacket | validKeyfobPacket) ? "Valid" : "Invalid", payload, ser, ser, typ);
- #else
-    printf("%s Payload: %lX (Serial %lu/%lX, Status %lX)\n", (validSensorPacket | validKeypadPacket | validKeyfobPacket) ? "Valid" : "Invalid", payload, ser, ser, typ);
- #endif
+ // #ifdef __arm__
+ //    printf("%s Payload: %llX (Serial %llu/%llX, Status %llX)\n", (validSensorPacket | validKeypadPacket | validKeyfobPacket) ? "Valid" : "Invalid", payload, ser, ser, typ);
+ // #else
+ //    printf("%s Payload: %lX (Serial %lu/%lX, Status %lX)\n", (validSensorPacket | validKeypadPacket | validKeyfobPacket) ? "Valid" : "Invalid", payload, ser, ser, typ);
+ // #endif
 
     packetCount++;
     if(!validSensorPacket && !validKeypadPacket && !validKeyfobPacket)
@@ -542,7 +542,7 @@ void DigitalDecoder::handlePayload(uint64_t payload)
     //
     if(validSensorPacket && !validKeypadPacket && !validKeyfobPacket && keypadStatusMap.find(ser) == keypadStatusMap.end())
     {
-        printf("Sensor Packet\n");
+        //printf("Sensor Packet\n");
         // We received a valid packet so the receiver must be working
         setRxGood(true);
         // Update the device
@@ -550,13 +550,13 @@ void DigitalDecoder::handlePayload(uint64_t payload)
     }
     else if (validKeypadPacket)
     {
-        printf("Keypad Packet\n");
+        //printf("Keypad Packet\n");
         setRxGood(true);
         updateKeypadState(ser, payload);
     }
     else if (validKeyfobPacket)
     {
-        printf("Keyfob Packet\n");
+        //printf("Keyfob Packet\n");
         setRxGood(true);
         updateKeyfobState(ser, payload);
     }
