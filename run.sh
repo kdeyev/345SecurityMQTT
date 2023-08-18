@@ -11,22 +11,22 @@
 #     exit $?
 # fi
 
-# AUTODISCOVERY=$(bashio::config "autodiscovery")
-# DEVICE_ID=$(bashio::config "device_id")
-# FREQUENCY=$(bashio::config "frequency")
-# SAMPLE_RATE=$(bashio::config "sample_rate")
-# GAIN=$(bashio::config "gain")
+AUTODISCOVERY=$(bashio::config "autodiscovery")
+DEVICE_ID=$(bashio::config "device_id")
+FREQUENCY=$(bashio::config "frequency")
+SAMPLE_RATE=$(bashio::config "sample_rate")
+GAIN=$(bashio::config "gain")
 
 # export MQTT_HOST=$(bashio::config "mqtt_host")
 # export MQTT_PORT=$(bashio::config "mqtt_port")
 # export MQTT_USERNAME=$(bashio::config "mqtt_username")
 # export MQTT_PASSWORD=$(bashio::config "mqtt_password")
 
-AUTODISCOVERY=false
-DEVICE_ID=1
-FREQUENCY=345000000
-SAMPLE_RATE=1000000
-GAIN=700
+# AUTODISCOVERY=false
+# DEVICE_ID=1
+# FREQUENCY=345000000
+# SAMPLE_RATE=1000000
+# GAIN=700
 
 export MQTT_HOST=localhost
 export MQTT_PORT=1883
