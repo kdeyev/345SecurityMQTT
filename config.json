@@ -14,7 +14,6 @@
   "uart": true,
   "host_network": false,
   "hassio_api": true,
-  "map": ["config:rw"],
   "options": {
     "autodiscovery": true,
     "device_id": 0,
