@@ -1,6 +1,6 @@
 {
   "name": "345SecurityMQTT",
-  "version": "0.2.6",
+  "version": "0.2.7",
   "init": false,
   "slug": "345securitymqtt",
   "description": "345SecurityMQTT with Auto Discovery support. It listens for events from 345MHz security sensors and sends messages via MQTT.",
@@ -8,7 +8,7 @@
   "arch": ["armhf", "armv7", "aarch64", "amd64", "i386"],
   "startup": "application",
   "boot": "auto",
-  "services": ["mqtt:need"],
+  "services": ["mqtt:want"],
   "usb": true,
   "udev": true,
   "options": {
@@ -16,21 +16,13 @@
     "device_id": 0,
     "frequency": 345000000,
     "gain": 700,
-    "sample_rate": 1000000,
-    "mqtt_host": "localhost",
-    "mqtt_port": 1883,
-    "mqtt_username": "mqtt",
-    "mqtt_password": "mqtt"
+    "sample_rate": 1000000
   },
   "schema": {
     "autodiscovery": "bool",
     "device_id": "int",
     "frequency": "int",
     "gain": "int",
-    "sample_rate": "int",
-    "mqtt_host": "str",
-    "mqtt_port": "int",
-    "mqtt_username": "str",
-    "mqtt_password": "str"
+    "sample_rate": "int"
   }
 }
