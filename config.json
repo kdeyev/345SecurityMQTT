@@ -11,9 +11,6 @@
   "services": ["mqtt:need"],
   "usb": true,
   "udev": true,
-  "uart": true,
-  "host_network": false,
-  "hassio_api": true,
   "options": {
     "autodiscovery": true,
     "device_id": 0,
