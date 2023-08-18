@@ -1,9 +1,8 @@
 {
   "name": "345SecurityMQTT",
-  "version": "0.2.3",
-  "init": false,
+  "version": "0.2.4",
   "slug": "345securitymqtt",
-  "description": "345SecurityMQTT with Auto Discovery support. It listen's for events from 345MHz security sensors and sends messages via MQTT.",
+  "description": "345SecurityMQTT with Auto Discovery support. It listens for events from 345MHz security sensors and sends messages via MQTT.",
   "url": "https://github.com/kdeyev/345SecurityMQTT",
   "arch": ["armhf", "armv7", "aarch64", "amd64", "i386"],
   "startup": "application",
