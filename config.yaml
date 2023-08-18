@@ -24,9 +24,17 @@ options:
   frequency: 345000000
   gain: 700
   sample_rate: 1000000
+  mqtt_host: localhost
+  mqtt_port: 1883
+  mqtt_username: mqtt
+  mqtt_password: mqtt
 schema:
   autodiscovery: bool
   device_id: int
   frequency: int
   gain: int
   sample_rate: int
+  mqtt_host: str
+  mqtt_port: int
+  mqtt_username: str
+  mqtt_password: str
