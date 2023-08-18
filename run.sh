@@ -33,7 +33,7 @@ FREQUENCY=345000000
 SAMPLE_RATE=1000000
 GAIN=700
 
-export MQTT_HOST=localhost
+export MQTT_HOST=core-mosquitto
 export MQTT_PORT=1883
 export MQTT_USERNAME=mqtt
 export MQTT_PASSWORD=mqtt
