@@ -1,6 +1,6 @@
 ---
 name: 345SecurityMQTT
-version: 0.2.8
+version: 0.2.9
 init: false
 slug: 345securitymqtt
 description: 345SecurityMQTT with Auto Discovery support. It listens for events from
@@ -15,7 +15,7 @@ arch:
 startup: application
 boot: auto
 services:
-- mqtt:want
+- mqtt:need
 usb: true
 udev: true
 options:
