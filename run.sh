@@ -17,10 +17,13 @@ FREQUENCY=$(bashio::config "frequency")
 SAMPLE_RATE=$(bashio::config "sample_rate")
 GAIN=$(bashio::config "gain")
 
-# export MQTT_HOST=$(bashio::config "mqtt_host")
-# export MQTT_PORT=$(bashio::config "mqtt_port")
-# export MQTT_USERNAME=$(bashio::config "mqtt_username")
-# export MQTT_PASSWORD=$(bashio::config "mqtt_password")
+export MQTT_HOST=$(bashio::config "mqtt_host")
+export MQTT_PORT=$(bashio::config "mqtt_port")
+export MQTT_USERNAME=$(bashio::config "mqtt_username")
+export MQTT_PASSWORD=$(bashio::config "mqtt_password")
+
+echo "Starting 345toMqtt -d $DEVICE_ID -f $FREQUENCY -a $AUTODISCOVERY -g $GAIN -s $SAMPLE_RATE"
+echo "$MQTT_HOST $MQTT_PORT $MQTT_USERNAME $MQTT_PASSWORD"
 
 AUTODISCOVERY=false
 DEVICE_ID=1
